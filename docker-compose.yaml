@@ -1,0 +1,56 @@
+#docker run
+#--name my-postgres-db
+#-e POSTGRES_USER=postgres
+#-e POSTGRES_PASSWORD=Karim1121
+#-e POSTGRES_DB=fake-user-app
+#--network my-network
+#-v my-data:/var/lib/postgresql/data
+#postgres
+
+version: '3.8'
+
+# docker network create -d bridge my-network-2
+networks:
+  my-network-2:
+    driver: bridge
+
+volumes:
+  my-data-2:
+
+services:
+  my-postgres-db-2:
+    image: postgres
+    container_name: my-postgres-db-2
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: Karim1121
+      POSTGRES_DB: fake-user-app
+    networks:
+      - my-network-2
+    volumes:
+      - my-data-2:/var/lib/postgresql/data
+    ports:
+      - '5435:5432'
+    restart: always
+
+  fake-user-app-2:
+    image: kmahrous1121/fake-user-app:v2
+    container_name: fake-user-app-2
+    environment:
+      DB_URL: jdbc:postgresql://my-postgres-db-2:5432/fake-user-app
+      DB_USERNAME: postgres
+      DB_PASSWORD: Karim1121
+    networks:
+      - my-network-2
+    ports:
+      - '2050:2050'
+    depends_on:
+      my-postgres-db-2:
+        condition: service_started
+#docker run
+#  --name fake-user-app
+#  -e DB_URL=jdbc:postgresql://my-postgres-db:5432/fake-user-app
+#  -e DB_USERNAME=postgres
+#  -e DB_PASSWORD=Karim1121
+#  --network my-network
+#  kmahrous1121/fake-user-app:v2
